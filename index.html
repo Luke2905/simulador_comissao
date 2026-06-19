@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulador de Contribuição de Comissão</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Comissão comercial</p>
+          <h1>Simulador de contribuição de comissão</h1>
+        </div>
+        <button class="secondary-action" id="copySummary" type="button">
+          Copiar resumo
+        </button>
+      </header>
+
+      <section class="workspace" aria-label="Simulador de comissão">
+        <form class="control-panel" id="simulatorForm">
+          <fieldset>
+            <legend>Período analisado</legend>
+            <div class="field-grid compact">
+              <label>
+                Ano
+                <input id="year" type="number" min="2000" max="2100" value="2026" />
+              </label>
+              <label>
+                Modo
+                <select id="periodMode">
+                  <option value="range">Faixa de meses</option>
+                  <option value="custom">Meses específicos</option>
+                </select>
+              </label>
+              <label class="range-only">
+                Mês inicial
+                <select id="startMonth"></select>
+              </label>
+              <label class="range-only">
+                Mês final
+                <select id="endMonth"></select>
+              </label>
+            </div>
+            <div class="month-picker" id="monthPicker" aria-label="Seleção de meses"></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Faturamento</legend>
+            <div class="field-grid">
+              <label>
+                Valor de faturamento por mês
+                <input id="monthlyRevenue" type="number" min="0" step="0.01" value="100000" />
+              </label>
+              <label>
+                Bônus sobre faturamento (%)
+                <input id="revenueBonusPct" type="number" min="0" step="0.01" value="1.5" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Novos negócios</legend>
+            <div class="field-grid">
+              <label>
+                Meta por mês
+                <input id="newBusinessGoal" type="number" min="0" step="0.01" value="40000" />
+              </label>
+              <label>
+                Bônus sobre meta (%)
+                <input id="newBusinessBonusPct" type="number" min="0" step="0.01" value="3" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Manutenção e recorrentes</legend>
+            <div class="field-grid">
+              <label>
+                Meta por mês
+                <input id="recurringGoal" type="number" min="0" step="0.01" value="60000" />
+              </label>
+              <label>
+                Bônus sobre meta (%)
+                <input id="recurringBonusPct" type="number" min="0" step="0.01" value="2" />
+              </label>
+            </div>
+          </fieldset>
+        </form>
+
+        <section class="result-panel" aria-live="polite">
+          <div class="kpi-strip">
+            <article class="kpi primary">
+              <span>Total de comissão</span>
+              <strong id="totalCommission">R$ 0,00</strong>
+            </article>
+            <article class="kpi">
+              <span>Meses no período</span>
+              <strong id="periodMonths">0</strong>
+            </article>
+            <article class="kpi">
+              <span>Taxa efetiva</span>
+              <strong id="effectiveRate">0%</strong>
+            </article>
+          </div>
+
+          <div class="summary-grid">
+            <article class="summary-item">
+              <span>Faturamento no período</span>
+              <strong id="periodRevenue">R$ 0,00</strong>
+            </article>
+            <article class="summary-item accent-revenue">
+              <span>Bônus faturamento</span>
+              <strong id="revenueBonus">R$ 0,00</strong>
+            </article>
+            <article class="summary-item accent-new">
+              <span>Bônus novos negócios</span>
+              <strong id="newBusinessBonus">R$ 0,00</strong>
+            </article>
+            <article class="summary-item accent-recurring">
+              <span>Bônus recorrentes</span>
+              <strong id="recurringBonus">R$ 0,00</strong>
+            </article>
+          </div>
+
+          <div class="chart-panel">
+            <div class="panel-heading">
+              <h2>Composição da comissão</h2>
+              <span id="periodLabel">-</span>
+            </div>
+            <div class="stacked-bar" id="stackedBar" aria-label="Composição percentual da comissão"></div>
+            <div class="legend">
+              <span><i class="dot revenue"></i>Faturamento</span>
+              <span><i class="dot new-business"></i>Novos negócios</span>
+              <span><i class="dot recurring"></i>Recorrentes</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mês</th>
+                  <th>Faturamento</th>
+                  <th>Bônus fat.</th>
+                  <th>Bônus novos</th>
+                  <th>Bônus recorr.</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="monthlyRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="script.js"></script>
+  </body>
+</html>
