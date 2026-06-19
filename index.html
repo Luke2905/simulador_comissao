@@ -47,15 +47,15 @@
           </fieldset>
 
           <fieldset>
-            <legend>Faturamento</legend>
+            <legend>Faturamento e bônus</legend>
             <div class="field-grid">
               <label>
-                Valor de faturamento por mês
-                <input id="monthlyRevenue" type="number" min="0" step="0.01" value="100000" />
+                Ticket médio por venda nova
+                <input id="averageTicket" type="number" min="0" step="0.01" value="30000" />
               </label>
               <label>
                 Bônus sobre faturamento (%)
-                <input id="revenueBonusPct" type="number" min="0" step="0.01" value="1.5" />
+                <input id="revenueBonusPct" type="number" min="0" step="0.01" value="0" />
               </label>
             </div>
           </fieldset>
@@ -64,11 +64,11 @@
             <legend>Novos negócios</legend>
             <div class="field-grid">
               <label>
-                Meta por mês
-                <input id="newBusinessGoal" type="number" min="0" step="0.01" value="40000" />
+                Meta de vendas por mês
+                <input id="newBusinessGoal" type="number" min="0" step="1" value="3" />
               </label>
               <label>
-                Bônus sobre meta (%)
+                Bônus sobre novos negócios (%)
                 <input id="newBusinessBonusPct" type="number" min="0" step="0.01" value="3" />
               </label>
             </div>
@@ -78,11 +78,11 @@
             <legend>Manutenção e recorrentes</legend>
             <div class="field-grid">
               <label>
-                Meta por mês
-                <input id="recurringGoal" type="number" min="0" step="0.01" value="60000" />
+                Recorrência por mês
+                <input id="recurringRevenue" type="number" min="0" step="0.01" value="300000" />
               </label>
               <label>
-                Bônus sobre meta (%)
+                Bônus recorrência (%)
                 <input id="recurringBonusPct" type="number" min="0" step="0.01" value="2" />
               </label>
             </div>
@@ -142,7 +142,11 @@
               <thead>
                 <tr>
                   <th>Mês</th>
+                  <th>Vendas novas</th>
+                  <th>Receita novos</th>
+                  <th>Recorrência</th>
                   <th>Faturamento</th>
+                  <th>Recorrência %</th>
                   <th>Bônus fat.</th>
                   <th>Bônus novos</th>
                   <th>Bônus recorr.</th>

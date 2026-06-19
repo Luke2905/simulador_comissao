@@ -362,7 +362,7 @@ select:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 780px;
+  min-width: 1180px;
 }
 
 th,
@@ -439,6 +439,36 @@ tbody tr.total-row td {
 .table-money-input input:focus {
   border-color: transparent;
   box-shadow: none;
+}
+
+.table-number-input {
+  width: min(104px, 100%);
+  min-height: 38px;
+  margin-left: auto;
+  background: #f8fafc;
+  text-align: right;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 74px;
+  min-height: 28px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  padding: 0 10px;
+}
+
+.status-pill.ok {
+  background: rgba(0, 111, 115, 0.12);
+  color: var(--brand-strong);
+}
+
+.status-pill.blocked {
+  background: rgba(180, 35, 24, 0.1);
+  color: var(--danger);
 }
 
 .toast {
