@@ -49,8 +49,10 @@ const percentFormatter = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 2,
 });
 
+const newSalesGoalOverrides = new Map();
 const newSalesOverrides = new Map();
 const newBusinessRevenueOverrides = new Map();
+const recurringGoalOverrides = new Map();
 const recurringRevenueOverrides = new Map();
 
 function setupMonthControls() {
@@ -130,15 +132,25 @@ function makePeriodLabel(monthIndexes) {
 }
 
 function buildMonthlyDetails(monthIndexes) {
-  const defaultSales = readNumber(inputs.newBusinessGoal);
+  const defaultNewSalesGoal = readNumber(inputs.newBusinessGoal);
   const revenueGoal = readNumber(inputs.revenueGoal);
-  const recurringGoal = readNumber(inputs.recurringGoal);
-  const defaultNewBusinessRevenue = Math.max(revenueGoal - recurringGoal, 0);
+  const defaultRecurringGoal = readNumber(inputs.recurringGoal);
   const newBusinessBonusPct = readNumber(inputs.newBusinessBonusPct) / 100;
-  const recurringBonusPct = readNumber(inputs.recurringBonusPct) / 100;
+  const recurringBonusMultiplier = readNumber(inputs.recurringBonusPct) / 100;
 
   return monthIndexes.map((monthIndex) => {
-    const newSales = getMonthValue(newSalesOverrides, monthIndex, defaultSales);
+    const newSalesGoal = getMonthValue(
+      newSalesGoalOverrides,
+      monthIndex,
+      defaultNewSalesGoal,
+    );
+    const newSales = getMonthValue(newSalesOverrides, monthIndex, newSalesGoal);
+    const recurringGoal = getMonthValue(
+      recurringGoalOverrides,
+      monthIndex,
+      defaultRecurringGoal,
+    );
+    const defaultNewBusinessRevenue = Math.max(revenueGoal - recurringGoal, 0);
     const newBusinessRevenue = getMonthValue(
       newBusinessRevenueOverrides,
       monthIndex,
@@ -152,22 +164,20 @@ function buildMonthlyDetails(monthIndexes) {
     const revenue = newBusinessRevenue + recurringRevenue;
     const recurringGoalRate =
       recurringGoal > 0 ? recurringRevenue / recurringGoal : 0;
-    const qualifiesRecurringBonus =
-      recurringGoal > 0 && recurringRevenue > recurringGoal * 0.8;
     const newBusinessBonus = newBusinessRevenue * newBusinessBonusPct;
-    const recurringBonus = qualifiesRecurringBonus
-      ? recurringRevenue * recurringBonusPct
-      : 0;
+    const recurringBonusRate = recurringBonusMultiplier * recurringGoalRate;
+    const recurringBonus = recurringRevenue * recurringBonusRate;
 
     return {
       monthIndex,
+      newSalesGoal,
       newSales,
       newBusinessRevenue,
       recurringRevenue,
       recurringGoal,
       revenue,
       recurringGoalRate,
-      qualifiesRecurringBonus,
+      recurringBonusRate,
       newBusinessBonus,
       recurringBonus,
       total: newBusinessBonus + recurringBonus,
@@ -178,6 +188,7 @@ function buildMonthlyDetails(monthIndexes) {
 function sumMonthlyDetails(monthlyDetails) {
   return monthlyDetails.reduce(
     (totals, detail) => {
+      totals.newSalesGoal += detail.newSalesGoal;
       totals.newSales += detail.newSales;
       totals.newBusinessRevenue += detail.newBusinessRevenue;
       totals.recurringRevenue += detail.recurringRevenue;
@@ -189,6 +200,7 @@ function sumMonthlyDetails(monthlyDetails) {
       return totals;
     },
     {
+      newSalesGoal: 0,
       newSales: 0,
       newBusinessRevenue: 0,
       recurringRevenue: 0,
@@ -308,11 +320,17 @@ function makeNumberInput(className, monthIndex, value, label) {
 function renderRows(monthIndexes, monthlyDetails, totals) {
   const rows = monthlyDetails
     .map((detail) => {
-      const recurringStatus = detail.qualifiesRecurringBonus ? "ok" : "blocked";
-
       return `
         <tr data-row-month="${detail.monthIndex}">
           <td>${monthNames[detail.monthIndex]}</td>
+          <td class="editable-cell">
+            ${makeNumberInput(
+              "monthly-new-sales-goal-input",
+              detail.monthIndex,
+              detail.newSalesGoal,
+              `Meta de vendas novas de ${monthNames[detail.monthIndex]}`,
+            )}
+          </td>
           <td class="editable-cell">
             ${makeNumberInput(
               "monthly-new-sales-input",
@@ -331,6 +349,14 @@ function renderRows(monthIndexes, monthlyDetails, totals) {
           </td>
           <td class="editable-cell">
             ${makeMoneyInput(
+              "monthly-recurring-goal-input",
+              detail.monthIndex,
+              detail.recurringGoal,
+              `Meta de recorrência de ${monthNames[detail.monthIndex]}`,
+            )}
+          </td>
+          <td class="editable-cell">
+            ${makeMoneyInput(
               "monthly-recurring-revenue-input",
               detail.monthIndex,
               detail.recurringRevenue,
@@ -339,12 +365,12 @@ function renderRows(monthIndexes, monthlyDetails, totals) {
           </td>
           <td data-field="revenue">${currencyFormatter.format(detail.revenue)}</td>
           <td data-field="recurringGoalRate">
-            <span class="status-pill ${recurringStatus}">
+            <span class="status-pill neutral">
               ${percentFormatter.format(detail.recurringGoalRate * 100)}%
             </span>
           </td>
           <td data-field="newBusinessBonus">${currencyFormatter.format(detail.newBusinessBonus)}</td>
-          <td data-field="recurringBonus">${currencyFormatter.format(detail.recurringBonus)}</td>
+          <td data-field="recurringBonus" title="Percentual aplicado: ${percentFormatter.format(detail.recurringBonusRate * 100)}%">${currencyFormatter.format(detail.recurringBonus)}</td>
           <td data-field="total">${currencyFormatter.format(detail.total)}</td>
         </tr>
       `;
@@ -357,8 +383,10 @@ function renderRows(monthIndexes, monthlyDetails, totals) {
   const totalRow = `
     <tr class="total-row">
       <td>Total</td>
+      <td data-total-field="newSalesGoal">${formatInputNumber(totals.newSalesGoal)}</td>
       <td data-total-field="newSales">${formatInputNumber(totals.newSales)}</td>
       <td data-total-field="newBusinessRevenue">${currencyFormatter.format(totals.newBusinessRevenue)}</td>
+      <td data-total-field="recurringGoal">${currencyFormatter.format(totals.recurringGoal)}</td>
       <td data-total-field="recurringRevenue">${currencyFormatter.format(totals.recurringRevenue)}</td>
       <td data-total-field="revenue">${currencyFormatter.format(totals.revenue)}</td>
       <td data-total-field="recurringGoalRate">${percentFormatter.format(totalRecurringGoalRate * 100)}%</td>
@@ -371,7 +399,7 @@ function renderRows(monthIndexes, monthlyDetails, totals) {
   outputs.monthlyRows.innerHTML =
     monthIndexes.length > 0
       ? `${rows}${totalRow}`
-      : `<tr><td colspan="9">Selecione pelo menos um mês para calcular o período.</td></tr>`;
+      : `<tr><td colspan="11">Selecione pelo menos um mês para calcular o período.</td></tr>`;
 }
 
 function updateRenderedRows(monthlyDetails, totals) {
@@ -387,12 +415,21 @@ function updateRenderedRows(monthlyDetails, totals) {
     const recurringGoalRateCell = row.querySelector(
       '[data-field="recurringGoalRate"]',
     );
-    const recurringStatus = detail.qualifiesRecurringBonus ? "ok" : "blocked";
+    const newSalesInput = row.querySelector(".monthly-new-sales-input");
+    const recurringRevenueInput = row.querySelector(".monthly-recurring-revenue-input");
+
+    if (newSalesInput && !newSalesOverrides.has(detail.monthIndex)) {
+      newSalesInput.value = formatInputNumber(detail.newSales);
+    }
+
+    if (recurringRevenueInput && !recurringRevenueOverrides.has(detail.monthIndex)) {
+      recurringRevenueInput.value = formatInputNumber(detail.recurringRevenue);
+    }
 
     row.querySelector('[data-field="revenue"]').textContent =
       currencyFormatter.format(detail.revenue);
     recurringGoalRateCell.innerHTML = `
-      <span class="status-pill ${recurringStatus}">
+      <span class="status-pill neutral">
         ${percentFormatter.format(detail.recurringGoalRate * 100)}%
       </span>
     `;
@@ -400,6 +437,8 @@ function updateRenderedRows(monthlyDetails, totals) {
       currencyFormatter.format(detail.newBusinessBonus);
     row.querySelector('[data-field="recurringBonus"]').textContent =
       currencyFormatter.format(detail.recurringBonus);
+    row.querySelector('[data-field="recurringBonus"]').title =
+      `Percentual aplicado: ${percentFormatter.format(detail.recurringBonusRate * 100)}%`;
     row.querySelector('[data-field="total"]').textContent =
       currencyFormatter.format(detail.total);
   });
@@ -407,8 +446,10 @@ function updateRenderedRows(monthlyDetails, totals) {
   const totalRecurringGoalRate =
     totals.recurringGoal > 0 ? totals.recurringRevenue / totals.recurringGoal : 0;
   const totalFields = {
+    newSalesGoal: formatInputNumber(totals.newSalesGoal),
     newSales: formatInputNumber(totals.newSales),
     newBusinessRevenue: currencyFormatter.format(totals.newBusinessRevenue),
+    recurringGoal: currencyFormatter.format(totals.recurringGoal),
     recurringRevenue: currencyFormatter.format(totals.recurringRevenue),
     revenue: currencyFormatter.format(totals.revenue),
     recurringGoalRate: `${percentFormatter.format(totalRecurringGoalRate * 100)}%`,
@@ -454,8 +495,10 @@ async function copySummary() {
     "Resumo da simulação de comissão",
     `Período: ${makePeriodLabel(result.monthIndexes)}`,
     `Meses: ${result.monthIndexes.length}`,
+    `Meta de vendas novas: ${formatInputNumber(result.totals.newSalesGoal)}`,
     `Vendas novas: ${formatInputNumber(result.totals.newSales)}`,
     `Valor de novos negócios: ${currencyFormatter.format(result.totals.newBusinessRevenue)}`,
+    `Meta de recorrência: ${currencyFormatter.format(result.totals.recurringGoal)}`,
     `Recorrência: ${currencyFormatter.format(result.totals.recurringRevenue)}`,
     `Atingimento da meta de recorrência: ${percentFormatter.format(totalRecurringGoalRate * 100)}%`,
     `Faturamento no período: ${currencyFormatter.format(result.totals.revenue)}`,
@@ -474,7 +517,7 @@ async function copySummary() {
 
 function handleMonthlyEdit(event) {
   const input = event.target.closest(
-    ".monthly-new-sales-input, .monthly-new-business-revenue-input, .monthly-recurring-revenue-input",
+    ".monthly-new-sales-goal-input, .monthly-new-sales-input, .monthly-new-business-revenue-input, .monthly-recurring-goal-input, .monthly-recurring-revenue-input",
   );
 
   if (!input) {
@@ -483,12 +526,20 @@ function handleMonthlyEdit(event) {
 
   const monthIndex = Number.parseInt(input.dataset.month, 10);
 
+  if (input.classList.contains("monthly-new-sales-goal-input")) {
+    newSalesGoalOverrides.set(monthIndex, readNumber(input));
+  }
+
   if (input.classList.contains("monthly-new-sales-input")) {
     newSalesOverrides.set(monthIndex, readNumber(input));
   }
 
   if (input.classList.contains("monthly-new-business-revenue-input")) {
     newBusinessRevenueOverrides.set(monthIndex, readNumber(input));
+  }
+
+  if (input.classList.contains("monthly-recurring-goal-input")) {
+    recurringGoalOverrides.set(monthIndex, readNumber(input));
   }
 
   if (input.classList.contains("monthly-recurring-revenue-input")) {

@@ -366,7 +366,7 @@ select:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1080px;
+  min-width: 1380px;
 }
 
 th,
@@ -468,6 +468,11 @@ tbody tr.total-row td {
 .status-pill.ok {
   background: rgba(0, 111, 115, 0.12);
   color: var(--brand-strong);
+}
+
+.status-pill.neutral {
+  background: rgba(95, 108, 175, 0.12);
+  color: var(--recurring);
 }
 
 .status-pill.blocked {
