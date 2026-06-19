@@ -72,6 +72,10 @@ function setupMonthControls() {
 }
 
 function readNumber(element) {
+  if (!element) {
+    return 0;
+  }
+
   const value = Number.parseFloat(element.value);
   return Number.isFinite(value) ? Math.max(value, 0) : 0;
 }
