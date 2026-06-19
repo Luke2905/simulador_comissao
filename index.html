@@ -47,15 +47,11 @@
           </fieldset>
 
           <fieldset>
-            <legend>Faturamento e bônus</legend>
-            <div class="field-grid">
+            <legend>Faturamento</legend>
+            <div class="field-grid single">
               <label>
                 Meta de faturamento por mês
                 <input id="revenueGoal" type="number" min="0" step="0.01" value="390000" />
-              </label>
-              <label>
-                Bônus sobre faturamento (%)
-                <input id="revenueBonusPct" type="number" min="0" step="0.01" value="0" />
               </label>
             </div>
           </fieldset>
@@ -110,10 +106,6 @@
               <span>Faturamento no período</span>
               <strong id="periodRevenue">R$ 0,00</strong>
             </article>
-            <article class="summary-item accent-revenue">
-              <span>Bônus faturamento</span>
-              <strong id="revenueBonus">R$ 0,00</strong>
-            </article>
             <article class="summary-item accent-new">
               <span>Bônus novos negócios</span>
               <strong id="newBusinessBonus">R$ 0,00</strong>
@@ -131,7 +123,6 @@
             </div>
             <div class="stacked-bar" id="stackedBar" aria-label="Composição percentual da comissão"></div>
             <div class="legend">
-              <span><i class="dot revenue"></i>Faturamento</span>
               <span><i class="dot new-business"></i>Novos negócios</span>
               <span><i class="dot recurring"></i>Recorrentes</span>
             </div>
@@ -147,7 +138,6 @@
                   <th>Recorrência</th>
                   <th>Faturamento</th>
                   <th>Meta recorr. %</th>
-                  <th>Bônus fat.</th>
                   <th>Bônus novos</th>
                   <th>Bônus recorr.</th>
                   <th>Total</th>

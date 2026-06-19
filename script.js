@@ -19,7 +19,6 @@ const inputs = {
   startMonth: document.querySelector("#startMonth"),
   endMonth: document.querySelector("#endMonth"),
   revenueGoal: document.querySelector("#revenueGoal"),
-  revenueBonusPct: document.querySelector("#revenueBonusPct"),
   newBusinessGoal: document.querySelector("#newBusinessGoal"),
   newBusinessBonusPct: document.querySelector("#newBusinessBonusPct"),
   recurringGoal: document.querySelector("#recurringGoal"),
@@ -31,7 +30,6 @@ const outputs = {
   periodMonths: document.querySelector("#periodMonths"),
   effectiveRate: document.querySelector("#effectiveRate"),
   periodRevenue: document.querySelector("#periodRevenue"),
-  revenueBonus: document.querySelector("#revenueBonus"),
   newBusinessBonus: document.querySelector("#newBusinessBonus"),
   recurringBonus: document.querySelector("#recurringBonus"),
   periodLabel: document.querySelector("#periodLabel"),
@@ -132,7 +130,6 @@ function buildMonthlyDetails(monthIndexes) {
   const revenueGoal = readNumber(inputs.revenueGoal);
   const recurringGoal = readNumber(inputs.recurringGoal);
   const defaultNewBusinessRevenue = Math.max(revenueGoal - recurringGoal, 0);
-  const revenueBonusPct = readNumber(inputs.revenueBonusPct) / 100;
   const newBusinessBonusPct = readNumber(inputs.newBusinessBonusPct) / 100;
   const recurringBonusPct = readNumber(inputs.recurringBonusPct) / 100;
 
@@ -153,7 +150,6 @@ function buildMonthlyDetails(monthIndexes) {
       recurringGoal > 0 ? recurringRevenue / recurringGoal : 0;
     const qualifiesRecurringBonus =
       recurringGoal > 0 && recurringRevenue > recurringGoal * 0.8;
-    const revenueBonus = revenue * revenueBonusPct;
     const newBusinessBonus = newBusinessRevenue * newBusinessBonusPct;
     const recurringBonus = qualifiesRecurringBonus
       ? recurringRevenue * recurringBonusPct
@@ -168,10 +164,9 @@ function buildMonthlyDetails(monthIndexes) {
       revenue,
       recurringGoalRate,
       qualifiesRecurringBonus,
-      revenueBonus,
       newBusinessBonus,
       recurringBonus,
-      total: revenueBonus + newBusinessBonus + recurringBonus,
+      total: newBusinessBonus + recurringBonus,
     };
   });
 }
@@ -184,7 +179,6 @@ function sumMonthlyDetails(monthlyDetails) {
       totals.recurringRevenue += detail.recurringRevenue;
       totals.recurringGoal += detail.recurringGoal;
       totals.revenue += detail.revenue;
-      totals.revenueBonus += detail.revenueBonus;
       totals.newBusinessBonus += detail.newBusinessBonus;
       totals.recurringBonus += detail.recurringBonus;
       totals.commission += detail.total;
@@ -196,7 +190,6 @@ function sumMonthlyDetails(monthlyDetails) {
       recurringRevenue: 0,
       recurringGoal: 0,
       revenue: 0,
-      revenueBonus: 0,
       newBusinessBonus: 0,
       recurringBonus: 0,
       commission: 0,
@@ -217,7 +210,6 @@ function calculate(options = {}) {
       ? `${percentFormatter.format((totals.commission / totals.revenue) * 100)}%`
       : "0,00%";
   outputs.periodRevenue.textContent = currencyFormatter.format(totals.revenue);
-  outputs.revenueBonus.textContent = currencyFormatter.format(totals.revenueBonus);
   outputs.newBusinessBonus.textContent = currencyFormatter.format(
     totals.newBusinessBonus,
   );
@@ -244,11 +236,6 @@ function calculate(options = {}) {
 function renderComposition(totals) {
   const parts = [
     {
-      label: "Fat.",
-      value: totals.revenueBonus,
-      className: "revenue",
-    },
-    {
       label: "Novos",
       value: totals.newBusinessBonus,
       className: "new-business",
@@ -264,7 +251,7 @@ function renderComposition(totals) {
 
   if (totals.commission <= 0) {
     const empty = document.createElement("div");
-    empty.className = "bar-segment revenue";
+    empty.className = "bar-segment new-business";
     empty.style.width = "100%";
     empty.textContent = "0%";
     outputs.stackedBar.appendChild(empty);
@@ -352,7 +339,6 @@ function renderRows(monthIndexes, monthlyDetails, totals) {
               ${percentFormatter.format(detail.recurringGoalRate * 100)}%
             </span>
           </td>
-          <td data-field="revenueBonus">${currencyFormatter.format(detail.revenueBonus)}</td>
           <td data-field="newBusinessBonus">${currencyFormatter.format(detail.newBusinessBonus)}</td>
           <td data-field="recurringBonus">${currencyFormatter.format(detail.recurringBonus)}</td>
           <td data-field="total">${currencyFormatter.format(detail.total)}</td>
@@ -372,7 +358,6 @@ function renderRows(monthIndexes, monthlyDetails, totals) {
       <td data-total-field="recurringRevenue">${currencyFormatter.format(totals.recurringRevenue)}</td>
       <td data-total-field="revenue">${currencyFormatter.format(totals.revenue)}</td>
       <td data-total-field="recurringGoalRate">${percentFormatter.format(totalRecurringGoalRate * 100)}%</td>
-      <td data-total-field="revenueBonus">${currencyFormatter.format(totals.revenueBonus)}</td>
       <td data-total-field="newBusinessBonus">${currencyFormatter.format(totals.newBusinessBonus)}</td>
       <td data-total-field="recurringBonus">${currencyFormatter.format(totals.recurringBonus)}</td>
       <td data-total-field="commission">${currencyFormatter.format(totals.commission)}</td>
@@ -382,7 +367,7 @@ function renderRows(monthIndexes, monthlyDetails, totals) {
   outputs.monthlyRows.innerHTML =
     monthIndexes.length > 0
       ? `${rows}${totalRow}`
-      : `<tr><td colspan="10">Selecione pelo menos um mês para calcular o período.</td></tr>`;
+      : `<tr><td colspan="9">Selecione pelo menos um mês para calcular o período.</td></tr>`;
 }
 
 function updateRenderedRows(monthlyDetails, totals) {
@@ -407,8 +392,6 @@ function updateRenderedRows(monthlyDetails, totals) {
         ${percentFormatter.format(detail.recurringGoalRate * 100)}%
       </span>
     `;
-    row.querySelector('[data-field="revenueBonus"]').textContent =
-      currencyFormatter.format(detail.revenueBonus);
     row.querySelector('[data-field="newBusinessBonus"]').textContent =
       currencyFormatter.format(detail.newBusinessBonus);
     row.querySelector('[data-field="recurringBonus"]').textContent =
@@ -425,7 +408,6 @@ function updateRenderedRows(monthlyDetails, totals) {
     recurringRevenue: currencyFormatter.format(totals.recurringRevenue),
     revenue: currencyFormatter.format(totals.revenue),
     recurringGoalRate: `${percentFormatter.format(totalRecurringGoalRate * 100)}%`,
-    revenueBonus: currencyFormatter.format(totals.revenueBonus),
     newBusinessBonus: currencyFormatter.format(totals.newBusinessBonus),
     recurringBonus: currencyFormatter.format(totals.recurringBonus),
     commission: currencyFormatter.format(totals.commission),
@@ -473,7 +455,6 @@ async function copySummary() {
     `Recorrência: ${currencyFormatter.format(result.totals.recurringRevenue)}`,
     `Atingimento da meta de recorrência: ${percentFormatter.format(totalRecurringGoalRate * 100)}%`,
     `Faturamento no período: ${currencyFormatter.format(result.totals.revenue)}`,
-    `Bônus faturamento: ${currencyFormatter.format(result.totals.revenueBonus)}`,
     `Bônus novos negócios: ${currencyFormatter.format(result.totals.newBusinessBonus)}`,
     `Bônus recorrentes: ${currencyFormatter.format(result.totals.recurringBonus)}`,
     `Total de comissão: ${currencyFormatter.format(result.totals.commission)}`,

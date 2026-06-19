@@ -135,6 +135,10 @@ legend {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.field-grid.single {
+  grid-template-columns: 1fr;
+}
+
 label {
   display: grid;
   gap: 7px;
@@ -243,7 +247,7 @@ select:focus {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -362,7 +366,7 @@ select:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1180px;
+  min-width: 1080px;
 }
 
 th,
