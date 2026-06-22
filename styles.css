@@ -11,6 +11,7 @@
   --revenue: #0b7285;
   --new: #b7791f;
   --recurring: #5f6caf;
+  --export: #2f855a;
   --danger: #b42318;
   --shadow: 0 14px 35px rgba(22, 32, 42, 0.08);
 }
@@ -247,7 +248,7 @@ select:focus {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -273,6 +274,10 @@ select:focus {
 
 .accent-recurring {
   border-top-color: var(--recurring);
+}
+
+.accent-export {
+  border-top-color: var(--export);
 }
 
 .chart-panel {
@@ -326,6 +331,10 @@ select:focus {
   background: var(--recurring);
 }
 
+.bar-segment.export {
+  background: var(--export);
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -359,6 +368,10 @@ select:focus {
   background: var(--recurring);
 }
 
+.dot.export {
+  background: var(--export);
+}
+
 .table-wrap {
   overflow-x: auto;
 }
@@ -366,7 +379,7 @@ select:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1380px;
+  min-width: 1780px;
 }
 
 th,
@@ -473,6 +486,11 @@ tbody tr.total-row td {
 .status-pill.neutral {
   background: rgba(95, 108, 175, 0.12);
   color: var(--recurring);
+}
+
+.status-pill.export-neutral {
+  background: rgba(47, 133, 90, 0.12);
+  color: var(--export);
 }
 
 .status-pill.blocked {

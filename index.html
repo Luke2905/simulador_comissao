@@ -83,6 +83,20 @@
               </label>
             </div>
           </fieldset>
+
+          <fieldset>
+            <legend>Exportação</legend>
+            <div class="field-grid">
+              <label>
+                Meta de exportação por mês
+                <input id="exportGoal" type="number" min="0" step="0.01" value="0" />
+              </label>
+              <label>
+                Bônus exportação (%)
+                <input id="exportBonusPct" type="number" min="0" step="0.01" value="0" />
+              </label>
+            </div>
+          </fieldset>
         </form>
 
         <section class="result-panel" aria-live="polite">
@@ -114,6 +128,10 @@
               <span>Bônus recorrentes</span>
               <strong id="recurringBonus">R$ 0,00</strong>
             </article>
+            <article class="summary-item accent-export">
+              <span>Bônus exportação</span>
+              <strong id="exportBonus">R$ 0,00</strong>
+            </article>
           </div>
 
           <div class="chart-panel">
@@ -125,6 +143,7 @@
             <div class="legend">
               <span><i class="dot new-business"></i>Novos negócios</span>
               <span><i class="dot recurring"></i>Recorrentes</span>
+              <span><i class="dot export"></i>Exportação</span>
             </div>
           </div>
 
@@ -138,10 +157,14 @@
                   <th>Valor novos</th>
                   <th>Meta recorr.</th>
                   <th>Recorrência</th>
+                  <th>Meta exp.</th>
+                  <th>Exportação</th>
                   <th>Faturamento</th>
                   <th>Meta recorr. %</th>
+                  <th>Meta exp. %</th>
                   <th>Bônus novos</th>
                   <th>Bônus recorr.</th>
+                  <th>Bônus exp.</th>
                   <th>Total</th>
                 </tr>
               </thead>
@@ -153,6 +176,6 @@
     </main>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="script.js?v=20260619-monthly-goals"></script>
+    <script src="script.js?v=20260622-exportacao"></script>
   </body>
 </html>
